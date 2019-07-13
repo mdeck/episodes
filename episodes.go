@@ -27,24 +27,33 @@ func (i *ShowInfo) DeltaDays() float64 {
 }
 
 func main() {
-	println("Episodes:")
-	println("")
+	println("Episodes:\n")
+	results := retrieveShowEpisodeInfo()
+	sortResults(results)
+	displayResults(results)
+}
 
+func retrieveShowEpisodeInfo() []*ShowInfo {
 	// for each imdb, get ShowInfo & add to slice
-	is := make([]*ShowInfo, len(imdbs))
+	results := make([]*ShowInfo, len(imdbs))
 	fmt.Printf("Loading.. ")
 	for idx, imdb := range imdbs {
-		fmt.Printf("%v.. ", len(is)-idx)
-		is[idx] = getInfo(imdb)
+		fmt.Printf("%v.. ", len(results)-idx)
+		results[idx] = getInfo(imdb)
 	}
 	fmt.Printf("\n\n")
+	return results
+}
 
-	sort.Slice(is, func(i, j int) bool {
-		return is[i].DeltaDays() < is[j].DeltaDays()
+func sortResults(results []*ShowInfo) {
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].DeltaDays() < results[j].DeltaDays()
 	})
+}
 
+func displayResults(results []*ShowInfo) {
 	// display
-	for _, i := range is {
+	for _, i := range results {
 		now := parsers.GetMidnight(time.Now())
 
 		days := math.Round(i.Prev.Airdate.Sub(now).Hours() / 24)
