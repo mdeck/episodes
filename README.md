@@ -1,9 +1,9 @@
 # Episode Schedule
-Utility lists previous &amp; upcoming TV show episodes.  The shows are currently hardcoded in episodes.go, and specified via 
+Utility lists previous &amp; upcoming TV show episodes.  The shows are currently hardcoded in config.go, and specified via 
 their imdb code (found in the show's imdb.com url.)
 
 ```console
-[user@pc episodes]$ go run episodes.go 
+[user@pc episodes]$ go run *.go 
 Episodes:
 
 Loading.. 15.. 14.. 13.. 12.. 11.. 10.. 9.. 8.. 7.. 6.. 5.. 4.. 3.. 2.. 1.. 
