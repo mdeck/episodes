@@ -10,6 +10,7 @@ import (
 	"math"
 	"net/http"
 	"sort"
+	"sync"
 	"time"
 )
 
@@ -27,24 +28,36 @@ func (i *ShowInfo) DeltaDays() float64 {
 }
 
 func main() {
-	println("Episodes:")
-	println("")
+	println("Episodes:\n")
+	results := retrieveShowEpisodeInfo()
+	sortResults(results)
+	displayResults(results)
+}
 
-	// for each imdb, get ShowInfo & add to slice
-	is := make([]*ShowInfo, len(imdbs))
+func retrieveShowEpisodeInfo() []*ShowInfo {
+	results := make([]*ShowInfo, len(imdbs))
+	doneShow := make(chan int)
 	fmt.Printf("Loading.. ")
 	for idx, imdb := range imdbs {
-		fmt.Printf("%v.. ", len(is)-idx)
-		is[idx] = getInfo(imdb)
+		go makeShowRequest(imdb, &results[idx], doneShow)
+	}
+	for idx, _ := range imdbs {
+		fmt.Printf("%v.. ", len(results)-idx)
+		<-doneShow
 	}
 	fmt.Printf("\n\n")
+	return results
+}
 
-	sort.Slice(is, func(i, j int) bool {
-		return is[i].DeltaDays() < is[j].DeltaDays()
+func sortResults(results []*ShowInfo) {
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].DeltaDays() < results[j].DeltaDays()
 	})
+}
 
+func displayResults(results []*ShowInfo) {
 	// display
-	for _, i := range is {
+	for _, i := range results {
 		now := parsers.GetMidnight(time.Now())
 
 		days := math.Round(i.Prev.Airdate.Sub(now).Hours() / 24)
@@ -65,14 +78,25 @@ func main() {
 	}
 }
 
-func getInfo(imdb string) *ShowInfo {
-	var i ShowInfo
+func makeShowRequest(imdb string, ptrInfo **ShowInfo, doneShow chan int) {
+	info := new(ShowInfo)
 	url := "http://api.tvmaze.com/lookup/shows?imdb=" + imdb
-	s := parsers.ParseShow(getBody(url))
-	i.Name = s.Name
-	i.Prev = parsers.ParseEpisode(getBody(s.PrevURL))
-	i.Next = parsers.ParseEpisode(getBody(s.NextURL))
-	return &i
+	show := parsers.ParseShow(getBody(url))
+	info.Name = show.Name
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go makeEpisodeRequest(show.PrevURL, &info.Prev, &wg)
+	go makeEpisodeRequest(show.NextURL, &info.Next, &wg)
+	wg.Wait()
+
+	*ptrInfo = info
+	doneShow <- 1
+}
+
+func makeEpisodeRequest(url string, ptrEp **parsers.Episode, wg *sync.WaitGroup) {
+	*ptrEp = parsers.ParseEpisode(getBody(url))
+	wg.Done()
 }
 
 func getBody(url string) string {
