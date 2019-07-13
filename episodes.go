@@ -10,6 +10,7 @@ import (
 	"math"
 	"net/http"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 )
@@ -100,10 +101,10 @@ func makeEpisodeRequest(url string, ptrEp **parsers.Episode, wg *sync.WaitGroup)
 }
 
 func getBody(url string) string {
-	//println("http request", url)
 	if len(url) == 0 {
 		return ""
 	}
+	url = strings.Replace(url, "http://", "https://", 1)
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatalln(err)
