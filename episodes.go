@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -87,19 +86,19 @@ func makeShowRequest(imdb string, ptrInfo **ShowInfo, doneShow chan int) {
 	show := parsers.ParseShow(getBody(url))
 	info.Name = show.Name
 
-	var wg sync.WaitGroup
-	wg.Add(2)
-	go makeEpisodeRequest(show.PrevURL, &info.Prev, &wg)
-	go makeEpisodeRequest(show.NextURL, &info.Next, &wg)
-	wg.Wait()
+	prev := make(chan *parsers.Episode)
+	next := make(chan *parsers.Episode)
+	go makeEpisodeRequest(show.PrevURL, prev)
+	go makeEpisodeRequest(show.NextURL, next)
+	info.Prev = <-prev
+	info.Next = <-next
 
 	*ptrInfo = info
 	doneShow <- 1
 }
 
-func makeEpisodeRequest(url string, ptrEp **parsers.Episode, wg *sync.WaitGroup) {
-	*ptrEp = parsers.ParseEpisode(getBody(url))
-	wg.Done()
+func makeEpisodeRequest(url string, c chan *parsers.Episode) {
+	c <- parsers.ParseEpisode(getBody(url))
 }
 
 func getBody(url string) string {
