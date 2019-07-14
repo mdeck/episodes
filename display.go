@@ -18,22 +18,18 @@ func (res *Results) DisplayFinal() {
 
 	now := GetMidnight(time.Now())
 	for _, info := range res.infos {
-		info.Print(info.Prev, now, false)
-		info.Print(info.Next, now, true)
+		info.Print(info.Prev, now, info.Name)
+		info.Print(info.Next, now, "")
 		println("")
 	}
 }
 
-func (info *ShowInfo) Print(ep *Episode, now time.Time, isNext bool) {
+func (info *ShowInfo) Print(ep *Episode, now time.Time, showName string) {
 	if ep.Season == 0 && ep.Number == 0 {
 		fmt.Printf(" %20s  -- Next episode unknown\n", "")
 		return
 	}
 
-	showName := info.Name
-	if isNext {
-		showName = ""
-	}
 	days := math.Round(ep.Airdate.Sub(now).Hours() / 24)
 	fmt.Printf(" %20s  %s %+4vd  [s%02v e%02v]  %s\n",
 		showName, ep.Airdate.Format("2006.Jan.02"),
