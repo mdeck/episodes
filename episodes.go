@@ -26,13 +26,6 @@ type ShowInfo struct {
 	Next *parsers.Episode
 }
 
-func (i *ShowInfo) DeltaDays() float64 {
-	now := parsers.GetMidnight(time.Now())
-	prev := math.Abs(now.Sub(i.Prev.Airdate).Hours())
-	next := math.Abs(now.Sub(i.Next.Airdate).Hours())
-	return math.Min(prev, next)
-}
-
 func main() {
 	println("Episodes:\n")
 	results := InitResults()
@@ -91,6 +84,13 @@ func (res *Results) Display() {
 
 		println("")
 	}
+}
+
+func (info *ShowInfo) DeltaDays() float64 {
+	now := parsers.GetMidnight(time.Now())
+	prev := math.Abs(now.Sub(info.Prev.Airdate).Hours())
+	next := math.Abs(now.Sub(info.Next.Airdate).Hours())
+	return math.Min(prev, next)
 }
 
 func (info *ShowInfo) Populate(wg *sync.WaitGroup) {
