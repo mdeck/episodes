@@ -35,10 +35,11 @@ func main() {
 }
 
 func retrieveShowEpisodeInfo() []*ShowInfo {
-	results := make([]*ShowInfo, len(imdbs))
-	c := make(chan *ShowInfo)
 	fmt.Printf("Loading.. ")
 	start := time.Now()
+
+	results := make([]*ShowInfo, len(imdbs))
+	c := make(chan *ShowInfo)
 	for _, imdb := range imdbs {
 		go makeShowRequest(imdb, c)
 	}
@@ -46,6 +47,7 @@ func retrieveShowEpisodeInfo() []*ShowInfo {
 		fmt.Printf("%v.. ", len(results)-idx)
 		results[idx] = <-c
 	}
+
 	elapsed := time.Since(start)
 	fmt.Printf("\nLoaded in %s\n\n", elapsed)
 	return results
@@ -58,7 +60,6 @@ func sortResults(results []*ShowInfo) {
 }
 
 func displayResults(results []*ShowInfo) {
-	// display
 	for _, i := range results {
 		now := parsers.GetMidnight(time.Now())
 
