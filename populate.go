@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func (res *Results) Populate() {
@@ -23,7 +24,10 @@ func (res *Results) Populate() {
 }
 
 func MakeShowInfo(url string, c chan<- *ShowInfo) {
-	j := parsers.ParseShow(getBody(url))
+	j, err := parsers.ParseShow(getBody(url))
+	if err != nil && err != parsers.ErrEmpty {
+		log.Fatalln(err)
+	}
 
 	prev, next := make(chan *Episode), make(chan *Episode)
 	go MakeEpisode(j.Links.PreviousEpisode.Href, prev)
@@ -33,7 +37,14 @@ func MakeShowInfo(url string, c chan<- *ShowInfo) {
 }
 
 func MakeEpisode(url string, c chan<- *Episode) {
-	j := parsers.ParseEpisode(getBody(url))
+	j, err := parsers.ParseEpisode(getBody(url))
+	if err != nil {
+		if err != parsers.ErrEmpty {
+			log.Fatalln(err)
+		}
+		// Default airstamp shouldn't influence sort order
+		j.Airstamp = time.Now().Add(time.Hour * 24 * 365 * 50)
+	}
 
 	airdate := GetMidnight(j.Airstamp.Local())
 	c <- &Episode{j.Name, j.Season, j.Number, airdate}

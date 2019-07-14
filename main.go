@@ -3,6 +3,7 @@
 package main
 
 import (
+	"log"
 	"time"
 )
 
@@ -25,6 +26,7 @@ type Episode struct {
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	results := Results{}
 	results.DisplayInit()
 	results.Populate()
