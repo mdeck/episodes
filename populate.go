@@ -8,41 +8,33 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"sync"
 )
 
 func (res *Results) Populate() {
-	var wg sync.WaitGroup
-	for _, info := range res.infos {
-		wg.Add(1)
-		go info.Populate(&wg)
+	res.infos = make([]*ShowInfo, len(imdbs))
+	c := make(chan *ShowInfo)
+	for idx := range res.infos {
+		url := "http://api.tvmaze.com/lookup/shows?imdb=" + imdbs[idx]
+		go MakeShowInfo(url, c)
 	}
-	wg.Wait()
+	for idx := range res.infos {
+		res.infos[idx] = <-c
+	}
 }
 
-func (info *ShowInfo) Populate(wg *sync.WaitGroup) {
-	url := "http://api.tvmaze.com/lookup/shows?imdb=" + info.Imdb
+func MakeShowInfo(url string, c chan<- *ShowInfo) {
 	j := parsers.ParseShow(getBody(url))
 
-	info.Name = j.Name
-	var wg2 sync.WaitGroup
-	wg2.Add(2)
-	info.Prev.Populate(j.Links.PreviousEpisode.Href, &wg2)
-	info.Next.Populate(j.Links.NextEpisode.Href, &wg2)
-	wg2.Wait()
+	prev, next := make(chan *Episode), make(chan *Episode)
+	go MakeEpisode(j.Links.PreviousEpisode.Href, prev)
+	go MakeEpisode(j.Links.NextEpisode.Href, next)
 
-	wg.Done()
+	c <- &ShowInfo{j.Name, <-prev, <-next}
 }
 
-func (ep *Episode) Populate(url string, wg *sync.WaitGroup) {
+func MakeEpisode(url string, c chan<- *Episode) {
 	j := parsers.ParseEpisode(getBody(url))
-	ep.Airdate = GetMidnight(j.Airstamp.Local())
-	ep.Name, ep.Season, ep.Number = j.Name, j.Season, j.Number
-	wg.Done()
-}
 
-func makeEpisodeRequest(url string, c chan<- *Episode) {
-	j := parsers.ParseEpisode(getBody(url))
 	airdate := GetMidnight(j.Airstamp.Local())
 	c <- &Episode{j.Name, j.Season, j.Number, airdate}
 }

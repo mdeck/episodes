@@ -12,10 +12,9 @@ type Results struct {
 }
 
 type ShowInfo struct {
-	Imdb string
 	Name string
-	Prev Episode
-	Next Episode
+	Prev *Episode
+	Next *Episode
 }
 
 type Episode struct {
@@ -26,19 +25,11 @@ type Episode struct {
 }
 
 func main() {
-	results := InitResults()
+	results := Results{}
 	results.DisplayInit()
 	results.Populate()
 	results.Sort()
 	results.DisplayFinal()
-}
-
-func InitResults() (r Results) {
-	r.infos = make([]*ShowInfo, len(imdbs))
-	for idx := range r.infos {
-		r.infos[idx] = &ShowInfo{Imdb: imdbs[idx]}
-	}
-	return
 }
 
 func GetMidnight(t time.Time) time.Time {
