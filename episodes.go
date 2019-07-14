@@ -36,15 +36,15 @@ func main() {
 
 func retrieveShowEpisodeInfo() []*ShowInfo {
 	results := make([]*ShowInfo, len(imdbs))
-	doneShow := make(chan int)
+	c := make(chan *ShowInfo)
 	fmt.Printf("Loading.. ")
 	start := time.Now()
-	for idx, imdb := range imdbs {
-		go makeShowRequest(imdb, &results[idx], doneShow)
+	for _, imdb := range imdbs {
+		go makeShowRequest(imdb, c)
 	}
 	for idx, _ := range imdbs {
 		fmt.Printf("%v.. ", len(results)-idx)
-		<-doneShow
+		results[idx] = <-c
 	}
 	elapsed := time.Since(start)
 	fmt.Printf("\nLoaded in %s\n\n", elapsed)
@@ -80,7 +80,7 @@ func displayResults(results []*ShowInfo) {
 	}
 }
 
-func makeShowRequest(imdb string, ptrInfo **ShowInfo, doneShow chan int) {
+func makeShowRequest(imdb string, c chan *ShowInfo) {
 	info := new(ShowInfo)
 	url := "http://api.tvmaze.com/lookup/shows?imdb=" + imdb
 	show := parsers.ParseShow(getBody(url))
@@ -93,8 +93,7 @@ func makeShowRequest(imdb string, ptrInfo **ShowInfo, doneShow chan int) {
 	info.Prev = <-prev
 	info.Next = <-next
 
-	*ptrInfo = info
-	doneShow <- 1
+	c <- info
 }
 
 func makeEpisodeRequest(url string, c chan *parsers.Episode) {
