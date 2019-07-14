@@ -4,28 +4,20 @@ package main
 
 import (
 	"./parsers"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
 	"sync"
-	"time"
 )
 
 func (res *Results) Populate() {
-	fmt.Printf("Loading.. ")
-	start := time.Now()
-
 	var wg sync.WaitGroup
 	for _, info := range res.infos {
 		wg.Add(1)
 		go info.Populate(&wg)
 	}
 	wg.Wait()
-
-	elapsed := time.Since(start)
-	fmt.Printf("\nLoaded in %s\n\n", elapsed)
 }
 
 func (info *ShowInfo) Populate(wg *sync.WaitGroup) {

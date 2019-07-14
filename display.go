@@ -9,7 +9,14 @@ import (
 	"time"
 )
 
-func (res *Results) Display() {
+func (res *Results) DisplayInit() {
+	fmt.Printf("Episodes:  ")
+	res.start = time.Now()
+}
+
+func (res *Results) DisplayFinal() {
+	fmt.Printf("[loaded in %s]\n\n", time.Since(res.start))
+
 	now := parsers.GetMidnight(time.Now())
 	for _, info := range res.infos {
 		info.Print(info.Prev, now, false)

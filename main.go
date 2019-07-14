@@ -4,10 +4,12 @@ package main
 
 import (
 	"./parsers"
+	"time"
 )
 
 type Results struct {
 	infos []*ShowInfo
+	start time.Time
 }
 
 type ShowInfo struct {
@@ -18,11 +20,11 @@ type ShowInfo struct {
 }
 
 func main() {
-	println("Episodes:\n")
 	results := InitResults()
+	results.DisplayInit()
 	results.Populate()
 	results.Sort()
-	results.Display()
+	results.DisplayFinal()
 }
 
 func InitResults() (r Results) {
