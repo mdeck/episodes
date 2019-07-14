@@ -3,7 +3,6 @@
 package main
 
 import (
-	"./parsers"
 	"fmt"
 	"math"
 	"time"
@@ -17,7 +16,7 @@ func (res *Results) DisplayInit() {
 func (res *Results) DisplayFinal() {
 	fmt.Printf("[loaded in %s]\n\n", time.Since(res.start))
 
-	now := parsers.GetMidnight(time.Now())
+	now := GetMidnight(time.Now())
 	for _, info := range res.infos {
 		info.Print(info.Prev, now, false)
 		info.Print(info.Next, now, true)
@@ -25,7 +24,7 @@ func (res *Results) DisplayFinal() {
 	}
 }
 
-func (info *ShowInfo) Print(ep *parsers.Episode, now time.Time, isNext bool) {
+func (info *ShowInfo) Print(ep *Episode, now time.Time, isNext bool) {
 	if ep.Season == 0 && ep.Number == 0 {
 		fmt.Printf(" %20s  -- Next episode unknown\n", "")
 		return

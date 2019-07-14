@@ -3,7 +3,6 @@
 package main
 
 import (
-	"./parsers"
 	"math"
 	"sort"
 	"time"
@@ -17,7 +16,7 @@ func (res *Results) Sort() {
 }
 
 func (info *ShowInfo) DeltaDays() float64 {
-	now := parsers.GetMidnight(time.Now())
+	now := GetMidnight(time.Now())
 	prev := math.Abs(now.Sub(info.Prev.Airdate).Hours())
 	next := math.Abs(now.Sub(info.Next.Airdate).Hours())
 	return math.Min(prev, next)

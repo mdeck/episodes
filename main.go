@@ -3,7 +3,6 @@
 package main
 
 import (
-	"./parsers"
 	"time"
 )
 
@@ -15,8 +14,15 @@ type Results struct {
 type ShowInfo struct {
 	Imdb string
 	Name string
-	Prev *parsers.Episode
-	Next *parsers.Episode
+	Prev *Episode
+	Next *Episode
+}
+
+type Episode struct {
+	Name    string
+	Season  int
+	Number  int
+	Airdate time.Time
 }
 
 func main() {
@@ -33,4 +39,8 @@ func InitResults() (r Results) {
 		r.infos[idx] = &ShowInfo{Imdb: imdbs[idx]}
 	}
 	return
+}
+
+func GetMidnight(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Local)
 }

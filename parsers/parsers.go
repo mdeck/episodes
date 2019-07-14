@@ -8,19 +8,11 @@ import (
 	"time"
 )
 
-type Episode struct {
-	Name    string
-	Season  int
-	Number  int
-	Airdate time.Time `json:"-"`
-	//AirdateString string `json:"airdate"`
+type EpisodeJSON struct {
+	Name     string
+	Season   int
+	Number   int
 	Airstamp time.Time
-}
-
-type Show struct {
-	Name    string
-	PrevURL string
-	NextURL string
 }
 
 type ShowJSON struct {
@@ -35,37 +27,29 @@ type ShowJSON struct {
 	} `json:"_links"`
 }
 
-func GetMidnight(t time.Time) time.Time {
-	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.Local)
-}
-
-func ParseEpisode(body string) *Episode {
-	e := new(Episode)
+func ParseEpisode(body string) *EpisodeJSON {
+	j := EpisodeJSON{}
 
 	if len(body) == 0 {
-		e.Airdate = time.Now().Add(time.Hour * 24 * 365 * 50)
-		return e
+		// Default airstamp shouldn't influence sort order
+		j.Airstamp = time.Now().Add(time.Hour * 24 * 365 * 50)
+		return &j
 	}
 
-	err := json.Unmarshal([]byte(body), e)
+	err := json.Unmarshal([]byte(body), &j)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	e.Airdate = GetMidnight(e.Airstamp.Local())
-	return e
+	return &j
 }
 
-func ParseShow(body string) *Show {
-	s := new(Show)
+func ParseShow(body string) *ShowJSON {
+	j := ShowJSON{}
 
-	var sj ShowJSON
-	if err := json.Unmarshal([]byte(body), &sj); err != nil {
+	if err := json.Unmarshal([]byte(body), &j); err != nil {
 		log.Fatalln(err)
 	}
 
-	s.Name = sj.Name
-	s.PrevURL = sj.Links.PreviousEpisode.Href
-	s.NextURL = sj.Links.NextEpisode.Href
-	return s
+	return &j
 }
