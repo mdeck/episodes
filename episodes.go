@@ -26,13 +26,6 @@ type ShowInfo struct {
 	Next *parsers.Episode
 }
 
-func (i *ShowInfo) DeltaDays() float64 {
-	now := parsers.GetMidnight(time.Now())
-	prev := math.Abs(now.Sub(i.Prev.Airdate).Hours())
-	next := math.Abs(now.Sub(i.Next.Airdate).Hours())
-	return math.Min(prev, next)
-}
-
 func main() {
 	println("Episodes:\n")
 	results := InitResults()
@@ -72,25 +65,35 @@ func (res *Results) Sort() {
 }
 
 func (res *Results) Display() {
-	for _, i := range res.infos {
-		now := parsers.GetMidnight(time.Now())
-
-		days := math.Round(i.Prev.Airdate.Sub(now).Hours() / 24)
-		fmt.Printf(" %20s  %s %+4vd  [s%02v e%02v]  %s\n",
-			i.Name, i.Prev.Airdate.Format("2006.Jan.02"),
-			int(days), i.Prev.Season, i.Prev.Number, i.Prev.Name)
-
-		if i.Next.Season == 0 && i.Next.Number == 0 {
-			fmt.Printf(" %20s  -- Next episode unknown\n", "")
-		} else {
-			days = math.Round(i.Next.Airdate.Sub(now).Hours() / 24)
-			fmt.Printf(" %20s  %s %+4vd  [s%02v e%02v]  %s\n",
-				"", i.Next.Airdate.Format("2006.Jan.02"),
-				int(days), i.Next.Season, i.Next.Number, i.Next.Name)
-		}
-
+	now := parsers.GetMidnight(time.Now())
+	for _, info := range res.infos {
+		info.Print(info.Prev, now, false)
+		info.Print(info.Next, now, true)
 		println("")
 	}
+}
+
+func (info *ShowInfo) Print(ep *parsers.Episode, now time.Time, isNext bool) {
+	if ep.Season == 0 && ep.Number == 0 {
+		fmt.Printf(" %20s  -- Next episode unknown\n", "")
+		return
+	}
+
+	showName := info.Name
+	if isNext {
+		showName = ""
+	}
+	days := math.Round(ep.Airdate.Sub(now).Hours() / 24)
+	fmt.Printf(" %20s  %s %+4vd  [s%02v e%02v]  %s\n",
+		showName, ep.Airdate.Format("2006.Jan.02"),
+		int(days), ep.Season, ep.Number, ep.Name)
+}
+
+func (info *ShowInfo) DeltaDays() float64 {
+	now := parsers.GetMidnight(time.Now())
+	prev := math.Abs(now.Sub(info.Prev.Airdate).Hours())
+	next := math.Abs(now.Sub(info.Next.Airdate).Hours())
+	return math.Min(prev, next)
 }
 
 func (info *ShowInfo) Populate(wg *sync.WaitGroup) {
