@@ -4,55 +4,53 @@ their imdb code (found in the show's imdb.com url.)
 
 ```console
 [user@pc episodes]$ go run *.go 
-Episodes:
+Episodes:  [loaded in 1.062331s]
 
-Loading.. 15.. 14.. 13.. 12.. 11.. 10.. 9.. 8.. 7.. 6.. 5.. 4.. 3.. 2.. 1.. 
-Loaded in 967.260021ms
+           Elementary  2019.Jul.11   -3d  [s07 e08]  Miss Understood
+                       2019.Jul.18    4d  [s07 e09]  On the Scent
 
-           Elementary  2019.Jul.11   -2d  [s07 e08]  Miss Understood
-                       2019.Jul.18    5d  [s07 e09]  On the Scent
-
-      Stranger Things  2019.Jul.04   -9d  [s03 e08]  Chapter Eight: The Battle of Starcourt
+      Stranger Things  2019.Jul.04  -10d  [s03 e08]  Chapter Eight: The Battle of Starcourt
                        -- Next episode unknown
 
-                 GLOW  2018.Jun.29 -379d  [s02 e10]  Every Potato Has a Receipt
-                       2019.Aug.09   27d  [s03 e01]  Episode 1
+                 GLOW  2018.Jun.29 -380d  [s02 e10]  Every Potato Has a Receipt
+                       2019.Aug.09   26d  [s03 e01]  Episode 1
 
-  Designated Survivor  2019.Jun.07  -36d  [s03 e10]  #truthorconsequences
+  Designated Survivor  2019.Jun.07  -37d  [s03 e10]  #truthorconsequences
                        -- Next episode unknown
 
-          Blue Bloods  2019.May.10  -64d  [s09 e22]  Something Blue
-                       2019.Sep.27   76d  [s10 e01]  Episode 1
+          Blue Bloods  2019.May.10  -65d  [s09 e22]  Something Blue
+                       2019.Sep.27   75d  [s10 e01]  Episode 1
 
-       The Good Place  2019.Jan.24 -170d  [s03 e13]  Pandemonium
-                       2019.Sep.26   75d  [s04 e01]  A Girl from Arizona - Part 1
+       The Good Place  2019.Jan.24 -171d  [s03 e13]  Pandemonium
+                       2019.Sep.26   74d  [s04 e01]  A Girl from Arizona - Part 1
 
-          The Orville  2019.Apr.25  -79d  [s02 e14]  The Road Not Taken
+          The Orville  2019.Apr.25  -80d  [s02 e14]  The Road Not Taken
                        -- Next episode unknown
 
-         Sister Wives  2019.Apr.21  -83d  [s13 e13]  Tell All: Part 2
+         Sister Wives  2019.Apr.21  -84d  [s13 e13]  Tell All: Part 2
                        -- Next episode unknown
 
-                Bosch  2019.Apr.19  -85d  [s05 e10]  Creep Signed His Kill
+                Bosch  2019.Apr.19  -86d  [s05 e10]  Creep Signed His Kill
                        -- Next episode unknown
 
- Star Trek: Discovery  2019.Apr.18  -86d  [s02 e14]  Such Sweet Sorrow, Part 2
+ Star Trek: Discovery  2019.Apr.18  -87d  [s02 e14]  Such Sweet Sorrow, Part 2
                        -- Next episode unknown
 
-            Westworld  2018.Jun.24 -384d  [s02 e10]  The Passenger
+            Westworld  2018.Jun.24 -385d  [s02 e10]  The Passenger
                        -- Next episode unknown
 
-              Goliath  2018.Jun.15 -393d  [s02 e08]  Tongue Tied
+              Goliath  2018.Jun.15 -394d  [s02 e08]  Tongue Tied
                        -- Next episode unknown
 
-       Silicon Valley  2018.May.13 -426d  [s05 e08]  Fifty-One Percent
+       Silicon Valley  2018.May.13 -427d  [s05 e08]  Fifty-One Percent
                        -- Next episode unknown
 
-            Mr. Robot  2017.Dec.13 -577d  [s03 e10]  shutdown -r
+            Mr. Robot  2017.Dec.13 -578d  [s03 e10]  shutdown -r
                        -- Next episode unknown
 
-             Sherlock  2017.Jan.15 -909d  [s04 e03]  The Final Problem
+             Sherlock  2017.Jan.15 -910d  [s04 e03]  The Final Problem
                        -- Next episode unknown
+n
 
 ```
 
