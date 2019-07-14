@@ -11,10 +11,16 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
+type Results struct {
+	infos []*ShowInfo
+}
+
 type ShowInfo struct {
+	Imdb string
 	Name string
 	Prev *parsers.Episode
 	Next *parsers.Episode
@@ -29,38 +35,44 @@ func (i *ShowInfo) DeltaDays() float64 {
 
 func main() {
 	println("Episodes:\n")
-	results := retrieveShowEpisodeInfo()
-	sortResults(results)
-	displayResults(results)
+	results := InitResults()
+	results.Populate()
+	results.Sort()
+	results.Display()
 }
 
-func retrieveShowEpisodeInfo() []*ShowInfo {
+func InitResults() (r Results) {
+	r.infos = make([]*ShowInfo, len(imdbs))
+	for idx := range r.infos {
+		r.infos[idx] = &ShowInfo{Imdb: imdbs[idx]}
+	}
+	return
+}
+
+func (res *Results) Populate() {
 	fmt.Printf("Loading.. ")
 	start := time.Now()
 
-	results := make([]*ShowInfo, len(imdbs))
-	c := make(chan *ShowInfo)
-	for _, imdb := range imdbs {
-		go makeShowRequest(imdb, c)
+	var wg sync.WaitGroup
+	for _, info := range res.infos {
+		wg.Add(1)
+		go info.Populate(&wg)
 	}
-	for idx := range imdbs {
-		fmt.Printf("%v.. ", len(results)-idx)
-		results[idx] = <-c
-	}
+	wg.Wait()
 
 	elapsed := time.Since(start)
 	fmt.Printf("\nLoaded in %s\n\n", elapsed)
-	return results
 }
 
-func sortResults(results []*ShowInfo) {
-	sort.Slice(results, func(i, j int) bool {
-		return results[i].DeltaDays() < results[j].DeltaDays()
+func (res *Results) Sort() {
+	infos := res.infos
+	sort.Slice(infos, func(i, j int) bool {
+		return infos[i].DeltaDays() < infos[j].DeltaDays()
 	})
 }
 
-func displayResults(results []*ShowInfo) {
-	for _, i := range results {
+func (res *Results) Display() {
+	for _, i := range res.infos {
 		now := parsers.GetMidnight(time.Now())
 
 		days := math.Round(i.Prev.Airdate.Sub(now).Hours() / 24)
@@ -81,9 +93,8 @@ func displayResults(results []*ShowInfo) {
 	}
 }
 
-func makeShowRequest(imdb string, c chan<- *ShowInfo) {
-	info := new(ShowInfo)
-	url := "http://api.tvmaze.com/lookup/shows?imdb=" + imdb
+func (info *ShowInfo) Populate(wg *sync.WaitGroup) {
+	url := "http://api.tvmaze.com/lookup/shows?imdb=" + info.Imdb
 	show := parsers.ParseShow(getBody(url))
 	info.Name = show.Name
 
@@ -94,7 +105,7 @@ func makeShowRequest(imdb string, c chan<- *ShowInfo) {
 	info.Prev = <-prev
 	info.Next = <-next
 
-	c <- info
+	wg.Done()
 }
 
 func makeEpisodeRequest(url string, c chan<- *parsers.Episode) {
