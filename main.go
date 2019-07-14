@@ -14,8 +14,8 @@ type Results struct {
 type ShowInfo struct {
 	Imdb string
 	Name string
-	Prev *Episode
-	Next *Episode
+	Prev Episode
+	Next Episode
 }
 
 type Episode struct {

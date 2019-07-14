@@ -24,15 +24,20 @@ func (info *ShowInfo) Populate(wg *sync.WaitGroup) {
 	url := "http://api.tvmaze.com/lookup/shows?imdb=" + info.Imdb
 	j := parsers.ParseShow(getBody(url))
 
-	prev := make(chan *Episode)
-	next := make(chan *Episode)
-	go makeEpisodeRequest(j.Links.PreviousEpisode.Href, prev)
-	go makeEpisodeRequest(j.Links.NextEpisode.Href, next)
-
 	info.Name = j.Name
-	info.Prev = <-prev
-	info.Next = <-next
+	var wg2 sync.WaitGroup
+	wg2.Add(2)
+	info.Prev.Populate(j.Links.PreviousEpisode.Href, &wg2)
+	info.Next.Populate(j.Links.NextEpisode.Href, &wg2)
+	wg2.Wait()
 
+	wg.Done()
+}
+
+func (ep *Episode) Populate(url string, wg *sync.WaitGroup) {
+	j := parsers.ParseEpisode(getBody(url))
+	ep.Airdate = GetMidnight(j.Airstamp.Local())
+	ep.Name, ep.Season, ep.Number = j.Name, j.Season, j.Number
 	wg.Done()
 }
 

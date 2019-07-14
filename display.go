@@ -18,8 +18,8 @@ func (res *Results) DisplayFinal() {
 
 	now := GetMidnight(time.Now())
 	for _, info := range res.infos {
-		info.Print(info.Prev, now, false)
-		info.Print(info.Next, now, true)
+		info.Print(&info.Prev, now, false)
+		info.Print(&info.Next, now, true)
 		println("")
 	}
 }
