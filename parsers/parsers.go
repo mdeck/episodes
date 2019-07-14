@@ -16,14 +16,14 @@ type EpisodeJSON struct {
 }
 
 type ShowJSON struct {
-	Name  string `json:"name"`
+	Name  string
 	Links struct {
 		PreviousEpisode struct {
-			Href string `json:"href"`
-		} `json:"previousepisode"`
+			Href string
+		}
 		NextEpisode struct {
-			Href string `json:"href"`
-		} `json:"nextepisode"`
+			Href string
+		}
 	} `json:"_links"`
 }
 
