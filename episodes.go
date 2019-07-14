@@ -43,7 +43,7 @@ func retrieveShowEpisodeInfo() []*ShowInfo {
 	for _, imdb := range imdbs {
 		go makeShowRequest(imdb, c)
 	}
-	for idx, _ := range imdbs {
+	for idx := range imdbs {
 		fmt.Printf("%v.. ", len(results)-idx)
 		results[idx] = <-c
 	}
