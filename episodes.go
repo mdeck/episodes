@@ -81,7 +81,7 @@ func displayResults(results []*ShowInfo) {
 	}
 }
 
-func makeShowRequest(imdb string, c chan *ShowInfo) {
+func makeShowRequest(imdb string, c chan<- *ShowInfo) {
 	info := new(ShowInfo)
 	url := "http://api.tvmaze.com/lookup/shows?imdb=" + imdb
 	show := parsers.ParseShow(getBody(url))
@@ -97,7 +97,7 @@ func makeShowRequest(imdb string, c chan *ShowInfo) {
 	c <- info
 }
 
-func makeEpisodeRequest(url string, c chan *parsers.Episode) {
+func makeEpisodeRequest(url string, c chan<- *parsers.Episode) {
 	c <- parsers.ParseEpisode(getBody(url))
 }
 
